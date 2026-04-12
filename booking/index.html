@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins;
+  background:#f5f6fa;
+}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg, #0f3d3e, #145a5a);
+  color:#fff;
+  padding:25px 15px 70px;
+  text-align:center;
+  border-bottom-left-radius:25px;
+  border-bottom-right-radius:25px;
+}
+
+.logo{
+  width:80px;
+  height:80px;
+  border-radius:20px;
+  background:#fff;
+  margin:auto;
+  overflow:hidden;
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.title{
+  font-size:22px;
+  margin-top:10px;
+  font-weight:600;
+}
+
+/* CARD */
+.card{
+  background:#fff;
+  margin:-50px 15px 20px;
+  border-radius:20px;
+  padding:15px;
+  box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+/* DATE */
+.dates{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.date-btn{
+  flex:1;
+  padding:10px;
+  border-radius:12px;
+  background:#eaeaea;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.date-btn.active{
+  background:#145a5a;
+  color:#fff;
+}
+
+.date-btn.lock{
+  opacity:.5;
+}
+
+/* FILTER */
+.filters{
+  display:flex;
+  gap:8px;
+  margin:10px 0;
+}
+
+.filter{
+  flex:1;
+  padding:8px;
+  border-radius:10px;
+  background:#eee;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+}
+
+/* LEGEND */
+.legend{
+  font-size:11px;
+  margin-bottom:10px;
+}
+
+/* SLOTS */
+.slot{
+  margin-bottom:10px;
+}
+
+.time{
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+}
+
+.box{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  font-size:12px;
+  cursor:pointer;
+  border:2px solid #ccc;
+}
+
+/* COLORS */
+.day{
+  border-color:#3b82f6;
+}
+
+.night{
+  border-color:#d4af37;
+}
+
+.booked{
+  background:#ddd;
+  pointer-events:none;
+}
+
+.selected{
+  background:#145a5a;
+  color:#fff;
+}
+
+/* CHECKOUT */
+.checkout{
+  margin-top:15px;
+  padding:12px;
+  background:#f1f1f1;
+  border-radius:12px;
+  text-align:center;
+  font-size:13px;
+}
+
+.btn{
+  margin-top:10px;
+  padding:12px;
+  width:100%;
+  border:none;
+  border-radius:12px;
+  background:#145a5a;
+  color:#fff;
+}
+
+.clear{
+  background:#ccc;
+  margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="logo">
+    <img src="../assets/psa.jpg">
+  </div>
+  <div class="title">Patel Sports Arena</div>
+</div>
+
+<div class="card">
+
+  <!-- DATES -->
+  <div class="dates">
+    <div class="date-btn active">Sun 12 Apr</div>
+    <div class="date-btn lock">Mon 13 Apr 🔒</div>
+    <div class="date-btn lock">Tue 14 Apr 🔒</div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filters">
+    <div class="filter">Available</div>
+    <div class="filter">₹400</div>
+    <div class="filter">₹600</div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    🟦 ₹400 | 🟨 ₹600 | Grey = Sold | Green = Selected
+  </div>
+
+  <!-- SLOTS -->
+  <div id="slots"></div>
+
+  <!-- CHECKOUT -->
+  <div class="checkout" id="checkout">
+    Selected 0 slots - Total ₹0
+  </div>
+
+  <button class="btn" onclick="book()">Confirm Booking</button>
+  <button class="btn clear" onclick="clearAll()">Clear Selection</button>
+
+</div>
+
+<script>
+
+let selected = [];
+
+const times = [
+"7-8 AM","8-9 AM","9-10 AM","10-11 AM",
+"11-12 PM","12-1 PM","1-2 PM","2-3 PM",
+"3-4 PM","4-5 PM","5-6 PM","6-7 PM",
+"7-8 PM","8-9 PM","9-10 PM","10-11 PM"
+];
+
+function createSlots(){
+  let html = "";
+  times.forEach((t,i)=>{
+    let type = i<10 ? "day" : "night";
+    let price = i<10 ? 400 : 600;
+
+    html += `
+      <div class="slot">
+        <div class="time">${t}</div>
+        <div class="row">
+          <div class="box ${type}" onclick="selectSlot('${t}','G1',${price},this)">G1</div>
+          <div class="box ${type}" onclick="selectSlot('${t}','G2',${price},this)">G2</div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("slots").innerHTML = html;
+}
+
+createSlots();
+
+function selectSlot(time,ground,price,el){
+
+  let key = time + ground;
+
+  if(el.classList.contains("selected")){
+    el.classList.remove("selected");
+    selected = selected.filter(s=>s.key!==key);
+  } else {
+    el.classList.add("selected");
+    selected.push({key,time,ground,price});
+  }
+
+  update();
+}
+
+function update(){
+  let total = selected.reduce((sum,s)=>sum+s.price,0);
+  document.getElementById("checkout").innerText =
+    `Selected ${selected.length} slots - Total ₹${total}`;
+}
+
+function clearAll(){
+  selected = [];
+  document.querySelectorAll(".box").forEach(b=>b.classList.remove("selected"));
+  update();
+}
+
+function book(){
+  if(selected.length===0){
+    alert("Select slots first");
+    return;
+  }
+
+  let msg = "Hi, I want to book:\n\n";
+
+  selected.forEach(s=>{
+    msg += `${s.time} (${s.ground}) - ₹${s.price}\n`;
+  });
+
+  let total = selected.reduce((sum,s)=>sum+s.price,0);
+
+  msg += `\nTotal: ₹${total}`;
+
+  let url = "https://wa.me/918951337609?text=" + encodeURIComponent(msg);
+
+  window.location.href = url;
+}
+
+</script>
+
+</body>
+</html>
