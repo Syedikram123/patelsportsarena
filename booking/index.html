@@ -19,7 +19,7 @@ body{
 .header{
   background:linear-gradient(135deg, #0f3d3e, #145a5a);
   color:#fff;
-  padding:32px 15px 50px;
+  padding:40px 15px 50px;
   text-align:center;
 }
 
@@ -84,7 +84,7 @@ body{
 .section h3{
   padding:10px;
   border-radius:10px;
-  font-size:14px;
+  font-size:15px;
 }
 
 .common{
@@ -219,13 +219,13 @@ body{
 
 <!-- COMMON -->
 <div class="section">
-  <h3 class="common">Price - ₹400 / Hour (7 AM - 5 PM)</h3>
+  <h3 class="common" id="commonTitle"></h3>
   <div class="grid" id="commonSlots"></div>
 </div>
 
 <!-- PEAK -->
 <div class="section">
-  <h3 class="peak">Price - ₹600 / Hour (5 PM - 11 PM)</h3>
+  <h3 class="peak" id="peakTitle"></h3>
   <div class="grid" id="peakSlots"></div>
 </div>
 
@@ -245,11 +245,32 @@ body{
 
 <script>
 
-// 📅 AUTO DATE
+// 📅 DATE + DAY
 const d = new Date();
+const day = d.getDay(); // 0=Sun, 6=Sat
+
 const options = { weekday: 'long', day: 'numeric', month: 'long' };
 document.getElementById("today").innerText =
   d.toLocaleDateString('en-IN', options);
+
+// 💰 PRICE LOGIC
+let commonPrice, peakPrice;
+
+if(day === 0 || day === 6){
+  // Weekend
+  commonPrice = 600;
+  peakPrice = 700;
+} else {
+  // Weekdays
+  commonPrice = 400;
+  peakPrice = 600;
+}
+
+document.getElementById("commonTitle").innerText =
+  `Price - ₹${commonPrice} / Hour (7 AM - 5 PM)`;
+
+document.getElementById("peakTitle").innerText =
+  `Price - ₹${peakPrice} / Hour (5 PM - 11 PM)`;
 
 // DATA
 let selected = [];
@@ -262,12 +283,12 @@ function createSlots(){
 
   // COMMON (7AM–5PM)
 for(let i=7;i<17;i++){
-  commonHTML += slotBlock(i, 400);
+  commonHTML += slotBlock(i, commonPrice);
 }
 
 // PEAK (5PM–11PM)
 for(let i=17;i<23;i++){
-  peakHTML += slotBlock(i, 600);
+  peakHTML += slotBlock(i, peakPrice);
 }
 
   document.getElementById("commonSlots").innerHTML = commonHTML;
@@ -291,8 +312,63 @@ function slotBlock(h, price){
     </div>
   </div>`;
 }
+// 🔗 LOAD FROM GOOGLE SHEET
+async function loadAvailability(){
+  let res = await fetch("https://script.google.com/macros/s/AKfycbwo68bk3yH_P_eXWit9uAVsJn8SS93-QHGjaeMZLbK77jIPx-VS2BgNVuJ8MN5L_VtQ/exec");
+  let data = await res.json();
+
+  data.forEach(slot => {
+    let h = slot.time;
+
+    if(slot.pitch1 === "U"){
+      disableSlot(h, "Pitch 1");
+    }
+
+    if(slot.pitch2 === "U"){
+      disableSlot(h, "Pitch 2");
+    }
+  });
+}
+
+// 🚫 DISABLE SLOT
+function disableSlot(time, pitch){
+  document.querySelectorAll(".box").forEach(el=>{
+    if(
+      el.innerText === pitch &&
+      el.getAttribute("onclick").includes(`'${time}'`)
+    ){
+      el.style.background = "#ef4444";
+      el.style.color = "#ffffff";
+      el.style.pointerEvents = "none";
+      el.innerText = "Booked";
+    }
+  });
+}
+
+// ⏰ BLOCK PAST TIME
+function blockPastSlots(){
+  let now = new Date();
+  let currentHour = now.getHours();
+  let currentMin = now.getMinutes();
+
+  document.querySelectorAll(".box").forEach(el=>{
+    let onclick = el.getAttribute("onclick");
+    let hour = parseInt(onclick.split("'")[1]);
+
+    if(hour < currentHour || (hour === currentHour && currentMin > 10)){
+      el.style.background = "#9ca3af";
+      el.style.color = "ffffff";
+      el.style.pointerEvents = "none";
+      el.innerText = "Closed";
+    }
+  });
+}
 
 createSlots();
+
+// ⬇️ AFTER SLOTS LOAD
+loadAvailability();
+blockPastSlots();
 
 // SELECT
 function select(time, pitch, price, el){
