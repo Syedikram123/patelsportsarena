@@ -10,13 +10,16 @@ body{
   margin:0;
   font-family:Poppins;
   background:#f5f6fa;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* IE */
+  user-select: none;         /* Standard */
 }
 
 /* HEADER */
 .header{
   background:linear-gradient(135deg, #0f3d3e, #145a5a);
   color:#fff;
-  padding:25px 15px 50px;
+  padding:32px 15px 50px;
   text-align:center;
 }
 
@@ -133,11 +136,11 @@ body{
 /* STICKY BAR */
 .bottom-bar{
   position:fixed;
-  bottom:0;
+  bottom:5px;
   left:0;
   width:100%;
   background:#fff;
-  padding:10px;
+  padding:0px;
   box-shadow:0 -4px 10px rgba(0,0,0,0.1);
 }
 
@@ -216,13 +219,13 @@ body{
 
 <!-- COMMON -->
 <div class="section">
-  <h3 class="common">Common - ₹400 / Hour (7 AM - 5 PM)</h3>
+  <h3 class="common">Price - ₹400 / Hour (7 AM - 5 PM)</h3>
   <div class="grid" id="commonSlots"></div>
 </div>
 
 <!-- PEAK -->
 <div class="section">
-  <h3 class="peak">Peak - ₹600 / Hour (5 PM - 11 PM)</h3>
+  <h3 class="peak">Price - ₹600 / Hour (5 PM - 11 PM)</h3>
   <div class="grid" id="peakSlots"></div>
 </div>
 
