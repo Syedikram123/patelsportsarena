@@ -273,7 +273,7 @@ body{
   <div class="logo">
     <img src="assets/psa.jpg" alt="logo">
   </div>
-  <div class="title">Patel Sports Arena</div>
+  <div class="title" id="adminTrigger">Patel Sports Arena</div>
   <div class="subtitle">Premium cricket turf for matches, practice, and tournaments.</div>
 </div>
 
@@ -358,5 +358,39 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 </script>
+
+<script>
+let timer;
+const holdTime = 3000;
+
+const trigger = document.getElementById("adminTrigger");
+
+if(trigger){
+
+  const start = () => {
+    timer = setTimeout(() => {
+      console.log("Redirecting to admin...");
+      window.location.href = "admin00100/index.html";
+    }, holdTime);
+  };
+
+  const cancel = () => {
+    clearTimeout(timer);
+  };
+
+  // Mobile
+  trigger.addEventListener("touchstart", start);
+  trigger.addEventListener("touchend", cancel);
+
+  // PC
+  trigger.addEventListener("mousedown", start);
+  trigger.addEventListener("mouseup", cancel);
+
+  // Safety
+  trigger.addEventListener("mouseleave", cancel);
+
+}
+</script>
+
 </body>
 </html>

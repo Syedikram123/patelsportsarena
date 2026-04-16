@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+body{
+  font-family:Poppins;
+  background:#f5f6fa;
+  margin:0;
+}
+
+/* LOGIN SCREEN */
+.login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+}
+
+input{
+  padding:10px;
+  width:200px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+button{
+  margin-top:10px;
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  background:#145a5a;
+  color:#fff;
+  cursor:pointer;
+}
+
+/* MAIN */
+.main{
+  display:none;
+  padding:10px;
+}
+
+h2{
+  text-align:center;
+}
+
+.today{
+  text-align:center;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+/* TABLE */
+.table{
+  background:#fff;
+  border-radius:15px;
+  padding:10px;
+}
+
+/* ROW */
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  padding:10px;
+  border-bottom:1px solid #eee;
+  align-items:center;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  .row{
+    grid-template-columns:1fr 1fr 1fr;
+    font-size:12px;
+  }
+}
+
+/* BUTTONS */
+.btn{
+  padding:6px 10px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#f1f5f9;
+  cursor:pointer;
+  font-weight:600;
+  color:#555;
+}
+
+/* ACTIVE */
+.active-a{
+  background:#22c55e;
+  color:#fff;
+  border:none;
+  box-shadow:0 0 8px rgba(34,197,94,0.5);
+}
+
+.active-u{
+  background:#ef4444;
+  color:#fff;
+  border:none;
+  box-shadow:0 0 8px rgba(239,68,68,0.5);
+}
+
+.btn:hover{
+  transform:scale(1.05);
+}
+
+.group{
+  display:flex;
+  gap:5px;
+}
+
+.spinner{
+  width:35px;
+  height:35px;
+  border:4px solid #ddd;
+  border-top:4px solid #145a5a;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+
+@keyframes spin{
+  0%{ transform:rotate(0deg); }
+  100%{ transform:rotate(360deg); }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN -->
+<div class="login" id="loginBox">
+  <div class="box">
+    <h3>Enter Password</h3>
+    <input type="password" id="pass">
+    <br>
+    <button onclick="check()">Enter</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+
+<h2>Admin Panel</h2>
+<div class="today" id="today"></div>
+<div id="loader" style="text-align:center; padding:20px;">
+  <div class="spinner"></div>
+</div>
+<div id="table" class="table" style="display:none;"></div>
+
+</div>
+
+<script>
+
+let url = "https://script.google.com/macros/s/AKfycbwo68bk3yH_P_eXWit9uAVsJn8SS93-QHGjaeMZLbK77jIPx-VS2BgNVuJ8MN5L_VtQ/exec";
+
+// 🔐 PASSWORD
+function check(){
+  let val = document.getElementById("pass").value;
+  if(val === "11011"){
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("main").style.display = "block";
+    load();
+    showDate();
+  } else {
+    alert("Wrong Password");
+  }
+}
+
+// 📅 DATE
+function showDate(){
+  let d = new Date();
+  let options = { weekday: 'long', day: 'numeric', month: 'long' };
+  document.getElementById("today").innerText =
+    d.toLocaleDateString('en-IN', options);
+}
+
+// LOAD
+async function load(){
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("table").style.display = "none";
+
+  let res = await fetch(url);
+  let data = await res.json();
+
+  let html = `
+  <div class="row">
+    <b>Time</b><b>Pitch 1</b><b>Pitch 2</b>
+  </div>`;
+
+  data.forEach(slot=>{
+    html += `
+    <div class="row">
+      <div>${formatTime(slot.time)}</div>
+
+      <div>
+  <div class="group">
+    <button class="btn ${slot.pitch1==='A'?'active-a':''}" 
+    onclick="update('${slot.time}','pitch1','A',this)">A</button>
+
+    <button class="btn ${slot.pitch1==='U'?'active-u':''}" 
+    onclick="update('${slot.time}','pitch1','U',this)">U</button>
+  </div>
+
+  <input 
+    type="text" 
+    placeholder="Name"
+    value="${slot.name1 || ''}"
+    onblur="saveName('${slot.time}','pitch1', this.value)"
+    style="margin-top:4px;width:90%;padding:5px;border-radius:8px;border:1px solid #ccc;"
+  >
+</div>
+
+<div>
+  <div class="group">
+    <button class="btn ${slot.pitch2==='A'?'active-a':''}" 
+    onclick="update('${slot.time}','pitch2','A',this)">A</button>
+
+    <button class="btn ${slot.pitch2==='U'?'active-u':''}" 
+    onclick="update('${slot.time}','pitch2','U',this)">U</button>
+  </div>
+
+  <input 
+    type="text" 
+    placeholder="Name"
+    value="${slot.name2 || ''}"
+    onchange="saveName('${slot.time}','pitch2', this.value)"
+    style="margin-top:4px;width:90%;padding:5px;border-radius:8px;border:1px solid #ccc;"
+  >
+</div>
+
+
+    </div>`;
+  });
+
+  document.getElementById("table").innerHTML = html;
+
+  // ✅ hide loader, show table
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("table").style.display = "block";
+}
+
+// TIME
+function formatTime(h){
+  let ampm = h>=12 ? "PM" : "AM";
+  let hr = h>12 ? h-12 : h;
+  return hr + " " + ampm;
+}
+
+// ⚡ INSTANT UPDATE
+function update(time, pitch, value, el){
+
+  let parent = el.parentElement;
+  let btns = parent.querySelectorAll(".btn");
+
+  btns.forEach(b=>{
+    b.classList.remove("active-a","active-u");
+  });
+
+  if(value === "A"){
+    btns[0].classList.add("active-a");
+  } else {
+    btns[1].classList.add("active-u");
+  }
+
+  // background update
+  fetch(url + "?time=" + time + "&pitch=" + pitch + "&value=" + value)
+    .catch(()=>alert("Error updating"));
+}
+
+function saveName(time, pitch, name){
+  fetch(url + "?time=" + time + 
+        "&pitch=" + pitch + 
+        "&value=U" + 
+        "&name=" + encodeURIComponent(name));
+}
+
+</script>
+
+</body>
+</html>

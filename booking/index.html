@@ -84,7 +84,7 @@ body{
 .section h3{
   padding:10px;
   border-radius:10px;
-  font-size:15px;
+  font-size:16px;
 }
 
 .common{
@@ -201,6 +201,22 @@ body{
 .btn:active{
   transform:scale(0.96);
 }
+
+.spinner{
+  width:40px;
+  height:40px;
+  border:4px solid #ddd;
+  border-top:4px solid #145a5a;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+
+@keyframes spin{
+  0%{ transform:rotate(0deg); }
+  100%{ transform:rotate(360deg); }
+}
+
 </style>
 </head>
 
@@ -212,23 +228,23 @@ body{
   </div>
   <div class="title">Choose Your Game Slot</div>
 </div>
-
 <div class="card">
 
 <div class="today" id="today"></div>
-
 <!-- COMMON -->
 <div class="section">
   <h3 class="common" id="commonTitle"></h3>
-  <div class="grid" id="commonSlots"></div>
+  <div class="grid" id="commonSlots" style="display:none;"></div>
 </div>
 
 <!-- PEAK -->
 <div class="section">
   <h3 class="peak" id="peakTitle"></h3>
-  <div class="grid" id="peakSlots"></div>
+  <div class="grid" id="peakSlots"></div><div class="grid" id="peakSlots" style="display:none;"></div>
 </div>
-
+<div id="loader" style="text-align:center; padding:20px;">
+  <div class="spinner"></div>
+</div>
 </div>
 
 <!-- BOTTOM BAR -->
@@ -314,8 +330,15 @@ function slotBlock(h, price){
 }
 // 🔗 LOAD FROM GOOGLE SHEET
 async function loadAvailability(){
+
+  // show loader
+  document.getElementById("loader").style.display = "block";
+
   let res = await fetch("https://script.google.com/macros/s/AKfycbwo68bk3yH_P_eXWit9uAVsJn8SS93-QHGjaeMZLbK77jIPx-VS2BgNVuJ8MN5L_VtQ/exec");
   let data = await res.json();
+
+  // create slots AFTER data loads
+  createSlots();
 
   data.forEach(slot => {
     let h = slot.time;
@@ -328,7 +351,17 @@ async function loadAvailability(){
       disableSlot(h, "Pitch 2");
     }
   });
+
+  // block past time
+  blockPastSlots();
+
+  // hide loader, show slots
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("commonSlots").style.display = "grid";
+  document.getElementById("peakSlots").style.display = "grid";
 }
+
+loadAvailability();
 
 // 🚫 DISABLE SLOT
 function disableSlot(time, pitch){
@@ -363,12 +396,6 @@ function blockPastSlots(){
     }
   });
 }
-
-createSlots();
-
-// ⬇️ AFTER SLOTS LOAD
-loadAvailability();
-blockPastSlots();
 
 // SELECT
 function select(time, pitch, price, el){
