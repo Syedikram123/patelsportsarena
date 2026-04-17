@@ -136,7 +136,7 @@ body{
 /* STICKY BAR */
 .bottom-bar{
   position:fixed;
-  bottom:5px;
+  bottom:8px;
   left:0;
   width:100%;
   background:#fff;
@@ -146,9 +146,9 @@ body{
 
 .summary{
   width:100%;                  /* full width */
-  padding:5px 10px;
+  padding:2px 10px;
 
-  font-size:15px;              /* bigger text */
+  font-size:16px;              /* bigger text */
   font-weight:600;
 
   background:#f1f5f9;          /* light clean bg */
@@ -217,6 +217,29 @@ body{
   100%{ transform:rotate(360deg); }
 }
 
+#scrollHint{
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #145a5a;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0.8;
+  z-index: 999;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce{
+  0%,100%{ transform: translate(-50%, 0); }
+  50%{ transform: translate(-50%, 6px); }
+}
+
+#scrollHint{
+  display: none;
+}
 </style>
 </head>
 
@@ -227,7 +250,9 @@ body{
     <img src="../assets/psa.jpg">
   </div>
   <div class="title">Choose Your Game Slot</div>
+  <div class="title">Scroll for more</div>
 </div>
+<div id="scrollHint">Scroll for more ↓</div>
 <div class="card">
 
 <div class="today" id="today"></div>
@@ -357,11 +382,16 @@ async function loadAvailability(){
 
   // hide loader, show slots
   document.getElementById("loader").style.display = "none";
-  document.getElementById("commonSlots").style.display = "grid";
-  document.getElementById("peakSlots").style.display = "grid";
+document.getElementById("commonSlots").style.display = "grid";
+document.getElementById("peakSlots").style.display = "grid";
+
+// ✅ NOW show scroll hint
+document.getElementById("scrollHint").style.display = "block";
 }
 
 loadAvailability();
+
+
 
 // 🚫 DISABLE SLOT
 function disableSlot(time, pitch){
@@ -456,6 +486,15 @@ function book(){
 
   window.location.href = url;
 }
+
+window.addEventListener("scroll", () => {
+  let hint = document.getElementById("scrollHint");
+  if(window.scrollY > 50){
+    hint.style.display = "none";
+  }
+});
+
+
 
 </script>
 
