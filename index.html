@@ -34,7 +34,7 @@ body{
 .header{
   background:linear-gradient(135deg, #0f3d3e, #145a5a);
   color:#fff;
-  padding:45px 20px 70px;
+  padding:60px 20px 70px;
   text-align:center;
   border-bottom-left-radius:25px;
   border-bottom-right-radius:25px;
@@ -323,7 +323,9 @@ body{
   <!-- BIG BUTTONS -->
   <div class="big-buttons">
     <button class="big-btn about-btn" onclick="toggleAbout()">More Info</button>
-    <button class="big-btn share-btn" onclick="sharePage()">🔗 Share</button>
+    <button class="big-btn share-btn" onclick="copyLink()">
+  🔗 Copy App Link
+</button>
   </div>
 
   <!-- ABOUT -->
@@ -389,6 +391,45 @@ if(trigger){
   // Safety
   trigger.addEventListener("mouseleave", cancel);
 
+}
+</script>
+
+<script>
+function copyLink() {
+  const link = "https://patelsportsarena.scangrow.in/download.apk";
+
+  // ✅ 1. Try native share (BEST for mobile + apps)
+  if (navigator.share) {
+    navigator.share({
+      title: "Patel Sports Arena App",
+      text: "Download our app 👇",
+      url: link
+    })
+    .then(() => console.log("Shared successfully"))
+    .catch(() => fallbackCopy(link));
+
+  } else {
+    // ❌ If share not supported → copy
+    fallbackCopy(link);
+  }
+}
+
+// ✅ Fallback copy function
+function fallbackCopy(link) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(() => {
+      alert("✅ Link copied!");
+    });
+  } else {
+    const tempInput = document.createElement("input");
+    tempInput.value = link;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+
+    alert("✅ Link copied!");
+  }
 }
 </script>
 
