@@ -6,13 +6,20 @@
 <title>Booking</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Poppins;
-  background:#f5f6fa;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none;     /* IE */
-  user-select: none;         /* Standard */
+body {
+  margin: 0;
+  font-family: Poppins;
+  background: #f5f6fa;
+
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  /* 🔥 SAFE AREA FIX (TOP + BOTTOM) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+
+  box-sizing: border-box;
 }
 
 /* HEADER */
@@ -134,14 +141,25 @@ body{
 }
 
 /* STICKY BAR */
-.bottom-bar{
-  position:fixed;
-  bottom:8px;
-  left:0;
-  width:100%;
-  background:#fff;
-  padding:0px;
-  box-shadow:0 -4px 10px rgba(0,0,0,0.1);
+.bottom-bar {
+  position: fixed;
+  bottom: 0; /* 🔥 stick to bottom completely */
+  left: 0;
+  width: 100%;
+
+  background: #fff;
+
+  /* 🔥 spacing inside */
+  padding: 10px 0px;
+
+  /* 🔥 safe area support (VERY IMPORTANT for phones) */
+  padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+
+  /* 🔥 shadow for premium feel */
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 
 .summary{

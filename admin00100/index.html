@@ -5,10 +5,20 @@
 <title>Admin Dashboard</title>
 
 <style>
-body{
-  font-family:Poppins;
-  background:#f5f6fa;
-  margin:0;
+body {
+  margin: 0;
+  font-family: Poppins;
+  background: #f5f6fa;
+
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  /* 🔥 SAFE AREA FIX (TOP + BOTTOM) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+
+  box-sizing: border-box;
 }
 
 /* LOGIN SCREEN */
